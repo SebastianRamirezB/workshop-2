@@ -51,6 +51,30 @@
               <fieldset>
                 <legend class="h2 text-center">Calculadora de Calorías</legend>
                 <div class="mb-3">
+                  <label for="nombre" class="form-label h6">Nombre</label>
+                  <input type="text" id="nombre" class="form-control" min="15" max="80" placeholder="Digíte su nombre">
+                </div>
+                <section class="row m-2 h-100">
+                  <span class="h6 p-0">Tipo de documento</span>
+                  <div class="form-check">
+                    <input class="form-check-input" value="C.C" type="radio" name="documento" id="cedula" checked>
+                    <label class="form-check-label" for="cedula">
+                      Cedula
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input" value="T.I" type="radio" name="genero" id="tarjeta_identidad">
+                    <label class="form-check-label" for="tarjeta_identidad">
+                      Tarjeta de identidad
+                    </label>
+                  </div>
+                </section>
+                <div class="mb-3">
+                  <label for="num_document" class="form-label h6">Numero de documento</label>
+                  <input type="number" id="num_document" class="form-control" placeholder="Digíte su numero de documento">
+                </div>
+                <div class="mb-3">
                   <label for="edad" class="form-label h6">Edad</label>
                   <input type="number" id="edad" class="form-control" min="15" max="80" placeholder="Digíte su edad">
                 </div>
@@ -68,7 +92,7 @@
                 <div class="mb-3">
                   <label for="actividad" class="form-label h6">Actividad física</label>
                   <select id="actividad" class="form-select">
-                    <option></option>
+                    <option value=""></option>
                     <option value="1.2">Poco o ningún ejercicio</option>
                     <option value="1.375">Ejercicio ligero (1-3 días a la semana)</option>
                     <option value="1.55">Ejercicio moderado (3-5 días a la semana)</option>
