@@ -1,78 +1,139 @@
+const formularioCalculadora = document.getElementById('formulario-calculadora');
+const resultado = document.getElementById('resultado');
 
-
+formularioCalculadora.addEventListener('submit', (evento) => {
+  evento.preventDefault();
+  calcularCalorias();
+});
 
 function calcularCalorias() {
+  const nombreInput = document.getElementById('nombre');
+  const tipoDocumentoInput = document.getElementById('tipo-documento');
+  const numeroDocumentoInput = document.getElementById('numero-documento');
+  const edadInput = document.getElementById('edad');
+  const pesoInput = document.getElementById('peso');
+  const estaturaInput = document.getElementById('estatura');
+  const actividadInput = document.getElementById('actividad');
+  const sexoInput = document.querySelector('input[name="genero"]:checked');
 
-    const multiplicadorTMB = {
-        peso: 10,
-        altura: 6.25,
-        edad: 5
-    }
+  const nombre = nombreInput.value;
+  const tipoDocumento = tipoDocumentoInput.value;
+  const numeroDocumento = numeroDocumentoInput.value;
+  const edad = parseInt(edadInput.value);
+  const peso = parseFloat(pesoInput.value);
+  const estatura = parseInt(estaturaInput.value);
+  const actividad = parseFloat(actividadInput.value);
+  const sexo = sexoInput.value;
 
-        //Formula hombres: valor actividad x (10 x peso en kg) + (6,25 × altura en cm) - (5 × edad en años) + 5
+  const informacionPaciente = {
+    nombre,
+    tipoDocumento,
+    numeroDocumento
+  };
 
-        //Formula mujeres: valor actividad x (10 x peso en kg) + (6,25 × altura en cm) - (5 × edad en años) - 161
+  const datosPaciente = {
+    edad,
+    peso,
+    estatura,
+    actividad,
+    sexo
+  };
 
-    
-    // totalCalorias.value = `${Math.floor(calculoCalorias)} kcal`;
-    
-    resultado.innerHTML = `
-        <div class=" card-body d-flex flex-column justify-content-center align-items-center h-100" id="calculo">
-            <h5 class="card-title h2">Calorías requeridas</h5>
-            <div class="mb-3 w-100">
-                <input class="form-control text-center" value="${} kcal" style="font-size: 2rem" disabled>
-            </div>
-        </div>
-    `
-     // Volver a limpiar variables
+  const calorias = calcularCaloriasTotales({ datosPaciente });
 
+  mostrarResultado({ informacionPaciente, calorias, edad });
+}
+
+function calcularCaloriasTotales({ datosPaciente }) {
+  const { edad, peso, estatura, actividad, sexo } = datosPaciente;
+
+  let calorias = actividad * (10 * peso) + 6.25 * estatura - 5 * edad;
+
+  if (sexo === 'masculino') {
+    calorias += 5;
+  } else {
+    calorias -= 161;
+  }
+
+  return calorias;
+}
+
+function mostrarResultado({ informacionPaciente, calorias, edad }) {
+  resultado.innerHTML = '';
+
+  let grupoPoblacional = '';
+  const { nombre, tipoDocumento, numeroDocumento } = informacionPaciente;
+  const numeroCalorias = new Intl.NumberFormat().format(calorias);
+
+  if (edad < 30) {
+    grupoPoblacional = 'Joven';
+  } else if (edad < 60) {
+    grupoPoblacional = 'Adulto';
+  } else {
+    grupoPoblacional = 'Adulto mayor';
+  }
+
+  const divResultado = document.createElement('div');
+  divResultado.className =
+    'd-flex justify-content-center align-items-center h-100';
+  divResultado.id = 'calculo';
+  divResultado.style.position = 'relative';
+  divResultado.innerHTML = `<span class="alert alert-light m-0" style="position:absolute;top: calc(50% - 84px);right: 12px;padding: 4px 8px;z-index:10;outline: 1px solid black;font-weight: bold">${grupoPoblacional}</span>`;
+  divResultado.innerHTML += `<span class="alert alert-success text-center m-0" style="padding:32px 28px">El paciente <strong>${nombre}</strong> identificado con ${tipoDocumento} No. <strong>${numeroDocumento}</strong>, requiere un total de <strong>${numeroCalorias}</strong> kcal para el sostenimiento de su TBM</span>`;
+
+  resultado.appendChild(divResultado);
+
+  aparecerResultado();
 }
 
 function mostrarMensajeDeError(msg) {
-    const calculo = document.querySelector('#calculo');
-    if (calculo) {
-        calculo.remove();
-    }
+  const calculo = document.querySelector('#calculo');
 
-    const divError = document.createElement('div');
-    divError.className = 'd-flex justify-content-center align-items-center h-100';
-    divError.innerHTML = `<span class="alert alert-danger text-center">${msg}</span>`;
+  if (calculo) {
+    calculo.remove();
+  }
 
-    resultado.appendChild(divError);
+  const divError = document.createElement('div');
+  divError.className = 'd-flex justify-content-center align-items-center h-100';
+  divError.innerHTML = `<span class="alert alert-danger text-center">${msg}</span>`;
 
-    setTimeout(() => {
-        divError.remove();
-        desvanecerResultado();
-    }, 5000);
+  resultado.appendChild(divError);
+
+  setTimeout(() => {
+    divError.remove();
+    desvanecerResultado();
+  }, 5000);
 }
 
-
-// Animaciones
 function aparecerResultado() {
-    resultado.style.top = '100vh';
-    resultado.style.display = 'block';
-    
-    let distancia = 100;
-    let resta = 0.3;
-    let id = setInterval(() => {
-        resta *= 1.1;
-        resultado.style.top = `${distancia - resta}vh`;
-        if (resta > 100) {
-            clearInterval(id);
-        }
-    }, 10)
+  resultado.style.top = '100vh';
+  resultado.style.display = 'block';
+
+  const distancia = 100;
+  let resta = 0.3;
+
+  const interval = setInterval(() => {
+    resta *= 1.1;
+
+    resultado.style.top = `${distancia - resta}vh`;
+    if (resta > 100) {
+      clearInterval(interval);
+    }
+  }, 10);
 }
 
 function desvanecerResultado() {
-    let distancia = 1;
+  let distancia = 1;
 
-    let id = setInterval(() => {
-        distancia *= 2;
-        resultado.style.top = `${distancia}vh`;
-        if (distancia > 100) {
-            clearInterval(id);
-            resultado.style.display = 'none';
-            resultado.style.top = 0;
-        }
-    }, 10)
+  const interval = setInterval(() => {
+    distancia *= 2;
+
+    resultado.style.top = `${distancia}vh`;
+    if (distancia > 100) {
+      resultado.style.display = 'none';
+      resultado.style.top = 0;
+
+      clearInterval(interval);
+    }
+  }, 10);
 }
