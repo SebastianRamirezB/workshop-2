@@ -1,31 +1,95 @@
+const formulario = document.querySelector('#formulario-calculadora');
+const resultado = document.querySelector('#resultado');
 
+formulario.addEventListener('submit', (event) => {
+    event.preventDefault();
+    calcularCalorias(event);
+});
 
+function calcularCalorias(event) {
+    aparecerResultado();
 
-function calcularCalorias() {
+    const {
+        nombre,
+        tipoDocumento,
+        numeroDocumento,
+        edad,
+        peso,
+        estatura,
+        actividad,
+        femenino,
+        masculino,
+    } = event.target;
 
-    const multiplicadorTMB = {
-        peso: 10,
-        altura: 6.25,
-        edad: 5
+    if (
+        !(
+            nombre.value &&
+            tipoDocumento.value &&
+            numeroDocumento.value &&
+            edad.value &&
+            peso.value &&
+            estatura.value &&
+            actividad.value
+        )
+    ) {
+        mostrarMensajeDeError('Todos los campos son obligatorios');
+        return;
     }
 
-        //Formula hombres: valor actividad x (10 x peso en kg) + (6,25 × altura en cm) - (5 × edad en años) + 5
+    const caloriasDiarias = calcularCaloriasTotales(
+        peso,
+        estatura,
+        edad,
+        actividad,
+        femenino,
+        masculino
+    );
 
-        //Formula mujeres: valor actividad x (10 x peso en kg) + (6,25 × altura en cm) - (5 × edad en años) - 161
+    const divResultado = document.createElement('div');
+    divResultado.className =
+        'd-flex justify-content-center align-items-center h-100';
+    divResultado.id = 'calculo';
+    divResultado.style.position = 'relative';
+    divResultado.innerHTML = `<span class="alert alert-light m-0" style="position:absolute;top: calc(50% - 84px);right: 12px;padding: 4px 8px;z-index:10;outline: 1px solid black;font-weight: bold">${determinarGrupoPoblacional(
+        edad.value
+    )}</span>`;
+    divResultado.innerHTML += `<span class="alert alert-success text-center m-0" style="padding:32px 28px">El paciente <strong>${nombre.value}</strong> identificado con ${tipoDocumento.value} No. <strong>${numeroDocumento.value}</strong>, requiere un total de <strong>${caloriasDiarias}</strong> kcal para el sostenimiento de su TBM</span>`;
 
-    
-    // totalCalorias.value = `${Math.floor(calculoCalorias)} kcal`;
-    
-    resultado.innerHTML = `
-        <div class=" card-body d-flex flex-column justify-content-center align-items-center h-100" id="calculo">
-            <h5 class="card-title h2">Calorías requeridas</h5>
-            <div class="mb-3 w-100">
-                <input class="form-control text-center" value="${} kcal" style="font-size: 2rem" disabled>
-            </div>
-        </div>
-    `
-     // Volver a limpiar variables
+    resultado.appendChild(divResultado);
+}
 
+function calcularCaloriasTotales(
+    peso,
+    estatura,
+    edad,
+    actividad,
+    femenino,
+    masculino
+) {
+    let calorias =
+        actividad.value * (10 * peso.value) +
+        6.25 * estatura.value -
+        5 * edad.value;
+
+    if (masculino.checked) {
+        calorias += 5;
+    } else if (femenino.checked) {
+        calorias -= 161;
+    }
+
+    return calorias;
+}
+
+function determinarGrupoPoblacional(edad) {
+    if (edad >= 15 && edad <= 29) {
+        return 'Joven';
+    } else if (edad >= 30 && edad <= 59) {
+        return 'Adulto';
+    } else if (edad >= 60) {
+        return 'Adulto Mayor';
+    } else {
+        return 'Edad no válida';
+    }
 }
 
 function mostrarMensajeDeError(msg) {
@@ -35,7 +99,8 @@ function mostrarMensajeDeError(msg) {
     }
 
     const divError = document.createElement('div');
-    divError.className = 'd-flex justify-content-center align-items-center h-100';
+    divError.className =
+        'd-flex justify-content-center align-items-center h-100';
     divError.innerHTML = `<span class="alert alert-danger text-center">${msg}</span>`;
 
     resultado.appendChild(divError);
@@ -46,12 +111,11 @@ function mostrarMensajeDeError(msg) {
     }, 5000);
 }
 
-
 // Animaciones
 function aparecerResultado() {
     resultado.style.top = '100vh';
     resultado.style.display = 'block';
-    
+
     let distancia = 100;
     let resta = 0.3;
     let id = setInterval(() => {
@@ -60,7 +124,7 @@ function aparecerResultado() {
         if (resta > 100) {
             clearInterval(id);
         }
-    }, 10)
+    }, 10);
 }
 
 function desvanecerResultado() {
@@ -74,5 +138,5 @@ function desvanecerResultado() {
             resultado.style.display = 'none';
             resultado.style.top = 0;
         }
-    }, 10)
+    }, 10);
 }
